@@ -22,6 +22,22 @@ You need numpy, scipy, pytorch (with cuda enabled) to run the GCN test. To run i
 python3 GCN_pubmed.py
 ```
 
+## Sample Output
+```
+Epoch 190 | Train_Loss: 0.0441
+Epoch 191 | Train_Loss: 0.0439
+Epoch 192 | Train_Loss: 0.0438
+Epoch 193 | Train_Loss: 0.0436
+Epoch 194 | Train_Loss: 0.0435
+Epoch 195 | Train_Loss: 0.0434
+Epoch 196 | Train_Loss: 0.0432
+Epoch 197 | Train_Loss: 0.0431
+Epoch 198 | Train_Loss: 0.0430
+Epoch 199 | Train_Loss: 0.0428
+the total training time is: 0:00:00.528633
+Epoch 199 | Test_accuracy: 0.7840
+```
+
 ## About
 This repository is now available for public use for teaching end to end workflow of deep learning. This implies that learners/researchers will learn (by doing) beyond what is generally available as tutorial on general-purpose deep learning framework. The aim is to learn how to write a new operator as part of deep learning layer, and how to use it inside a deep learning module using Python environment (Pytorch or Tensorflow). The second stage is to know more about the role of tensor in the computation graph (forward and backward computation) and implement the kernel of the new operator in an independent CUDA module.
 
