@@ -22,7 +22,7 @@ You need numpy, scipy, pytorch (with cuda enabled) to run the GCN test. To run i
 python3 GCN_pubmed.py
 ```
 
-## Sample Output
+## Sample Output (spmm)
 ```
 Epoch 190 | Train_Loss: 0.0441
 Epoch 191 | Train_Loss: 0.0439
