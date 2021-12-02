@@ -108,20 +108,63 @@ __device__ inline op_scalar_fn get_fn_kernel(op_t op) {
 
 __global__ void spmm(const csr_t* __restrict__ obj1, float* x, float * y, op_t op, const bool reverse, const bool norm, const int dim) 
 {
-    //TODO
+    int row_index = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (row_index >= obj1->v) {
+        return;
+    }
+
+    vid_t degree;
+    float * input = x + dim * row_index;
+    float * output = y + dim * row_index;
+    vid_t * nebrs;
+    degree = obj1->get_nebrs(row_index, nebrs);
+
+     // Normalize the input
+    if (reverse) {
+        for (vid_t i = 0 ; i < dim ; ++i) {
+            input[i] /= degree + 1;
+        }
+    }
+
+    // Self-loop
+    for (vid_t i = 0 ; i < dim ; i++) {
+        output[i] = input[i];
+    }
+
+    // Multiplication
+    for (vid_t j = 0 ; j < degree ; j++) {
+        float * nebrs_ptr = x + dim * nebrs[j];
+        for (vid_t k = 0 ; k < dim ; ++k) {
+            output[k] += nebrs_ptr[k];
+        }
+    }
+
+    // Normalize the output
+    if (!reverse) {
+        for (vid_t i = 0 ; i < dim ; ++i) {
+            output[i] /= degree + 1;
+        }
+    }
 }
 
 //warp per row (best)
 __global__ void spmm_warp(const csr_t* __restrict__ obj1, float* x, float * y, op_t op, const bool reverse, const bool norm, const int dim)
 {
-    //TODO
+    //TODO  
 }
 
 void invoke_spmm(csr_t * obj1, array2d_t < float > & x1, array2d_t < float > & y1, op_t op, bool reverse, bool norm, int dim) {
     int warp_size=32;
     int block_size=1024;
-    int nBlocks =  0; // TODO 
-    spmm_warp <<<nBlocks,block_size>>> (obj1, x1.data_ptr, y1.data_ptr, op, true, true, dim);
+
+    // spmm
+    int nBlocks =  (int) ceil(obj1->v / (float)(block_size));; // TODO 
+    spmm <<<nBlocks,block_size>>> (obj1, x1.data_ptr, y1.data_ptr, op, reverse, true, dim);
+
+    // spmm_warp
+    //int nBlocks =  (int) ceil(obj1->v / (float)(block_size / warp_size));; // TODO 
+    //spmm_warp <<<nBlocks,block_size>>> (obj1, x1.data_ptr, y1.data_ptr, op, reverse, true, dim);
 
     cudaDeviceSynchronize();
 }
